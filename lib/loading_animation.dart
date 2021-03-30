@@ -7,18 +7,18 @@ class LoadingAnimation extends StatefulWidget {
   final Color lineColor;
   final Color progressColor;
   final LoadingController controller;
-  final AnimationController anim;
+  final AnimationController? anim;
   final double size;
   final EdgeInsets margin;
 
-  LoadingAnimation({Color lineColor,
-    Color progressColor,
-    double percentage,
-    double thickness,
-    LoadingController controller,
+  LoadingAnimation({Color? lineColor,
+    Color? progressColor,
+    double? percentage,
+    double? thickness,
+    LoadingController? controller,
     this.anim,
-    double size,
-    EdgeInsets margin})
+    double? size,
+    EdgeInsets? margin})
       : assert(controller == null || (percentage == null && thickness == null)),
         this.lineColor = lineColor ?? LoadingAnimation.defaultLineColor,
         this.progressColor = progressColor ?? LoadingAnimation.defaultProgressColor,
@@ -42,10 +42,10 @@ class _LoadingAnimationState extends State<LoadingAnimation> {
   void initState() {
     super.initState();
 
-    widget.anim.addListener(() {
+    widget.anim!.addListener(() {
       if (this.mounted) {
         setState(() {
-          widget.controller.percentage = widget.anim.value * widget.size;
+          widget.controller.percentage = widget.anim!.value * widget.size;
         });
       }
     });
@@ -69,11 +69,11 @@ class _LoadingAnimationState extends State<LoadingAnimation> {
 }
 
 class LoadingPainter extends CustomPainter {
-  Color lineColor;
-  Color progressColor;
-  double completePercent;
-  double thickness;
-  final double maxHeight;
+  Color? lineColor;
+  Color? progressColor;
+  double? completePercent;
+  double? thickness;
+  final double? maxHeight;
 
   LoadingPainter({this.lineColor,
     this.progressColor,
@@ -84,32 +84,32 @@ class LoadingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     Paint line = new Paint()
-      ..color = lineColor
+      ..color = lineColor!
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke
-      ..strokeWidth = thickness;
+      ..strokeWidth = thickness!;
     Paint complete = new Paint()
-      ..color = progressColor
+      ..color = progressColor!
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke
-      ..strokeWidth = thickness;
+      ..strokeWidth = thickness!;
 
     Offset center = new Offset(size.width / 2, size.height / 2);
     double radius = min(size.width / 2, size.height / 2);
     canvas.drawCircle(center, radius, line);
-    double factor = maxHeight * 0.9;
+    double factor = maxHeight! * 0.9;
 
-    double arc = completePercent <= (maxHeight * 0.5)
-        ? (completePercent * maxHeight / factor)
-        : ((maxHeight * 0.5) * maxHeight / factor) -
-        ((completePercent - (maxHeight * 0.5)) * maxHeight / factor);
+    double arc = completePercent! <= (maxHeight! * 0.5)
+        ? (completePercent! * maxHeight! / factor)
+        : ((maxHeight! * 0.5) * maxHeight! / factor) -
+        ((completePercent! - (maxHeight! * 0.5)) * maxHeight! / factor);
 
-    double arcAngle = 2 * pi * (arc / maxHeight);
+    double arcAngle = 2 * pi * (arc / maxHeight!);
 
     double startPercentage =
-    ((completePercent - (maxHeight - factor)) * maxHeight / factor)
-        .clamp(0.0, maxHeight);
-    double startAngle = lerpDouble(-0.5, 1.5, startPercentage / maxHeight);
+    ((completePercent! - (maxHeight! - factor)) * maxHeight! / factor)
+        .clamp(0.0, maxHeight!);
+    double startAngle = lerpDouble(-0.5, 1.5, startPercentage / maxHeight!)!;
 
     canvas.drawArc(Rect.fromCircle(center: center, radius: radius),
         pi * startAngle, arcAngle, false, complete);
@@ -136,7 +136,7 @@ class LoadingController extends ValueNotifier<LoadingValue> {
         value.copyWith(percentage: this.percentage, thickness: newThickness);
   }
 
-  LoadingController({double percentage, double thickness})
+  LoadingController({double? percentage, double? thickness})
       : super(percentage == null && thickness == null
       ? LoadingValue.empty
       : new LoadingValue(
@@ -144,7 +144,7 @@ class LoadingController extends ValueNotifier<LoadingValue> {
     thickness: thickness ?? 1.0,
   ));
 
-  LoadingController.fromValue(LoadingValue value)
+  LoadingController.fromValue(LoadingValue? value)
       : super(value ?? LoadingValue.empty);
 
   void clear() {
@@ -161,7 +161,7 @@ class LoadingValue {
 
   static const LoadingValue empty = const LoadingValue();
 
-  LoadingValue copyWith({double percentage, double thickness}) {
+  LoadingValue copyWith({double? percentage, double? thickness}) {
     return new LoadingValue(
         percentage: percentage ?? this.percentage,
         thickness: thickness ?? this.thickness);

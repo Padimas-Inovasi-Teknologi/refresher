@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
 class RefreshIndicatorPhysics extends ScrollPhysics {
-  static double height = 100.0;
+  static double? height = 100.0;
   /// Creates scroll physics that bounce back from the edge.
-  RefreshIndicatorPhysics({ScrollPhysics parent}) : super(parent: parent);
+  RefreshIndicatorPhysics({ScrollPhysics? parent}) : super(parent: parent);
 
   @override
-  RefreshIndicatorPhysics applyTo(ScrollPhysics ancestor) {
+  RefreshIndicatorPhysics applyTo(ScrollPhysics? ancestor) {
     return RefreshIndicatorPhysics(parent: buildParent(ancestor));
   }
 
@@ -64,15 +64,15 @@ class RefreshIndicatorPhysics extends ScrollPhysics {
   double applyBoundaryConditions(ScrollMetrics position, double value) => 0.0;
 
   @override
-  Simulation createBallisticSimulation(ScrollMetrics position, double velocity) {
+  Simulation? createBallisticSimulation(ScrollMetrics position, double velocity) {
     final Tolerance tolerance = this.tolerance;
     if (velocity.abs() >= tolerance.velocity || position.outOfRange) {
       return BouncingScrollSimulation(
         spring: spring,
         position: position.pixels,
         velocity: velocity * 0.91, // TODO(abarth): We should move this constant closer to the drag end.
-        leadingExtent: -RefreshIndicatorPhysics.height, //position.minScrollExtent,
-        trailingExtent: -RefreshIndicatorPhysics.height,
+        leadingExtent: -RefreshIndicatorPhysics.height!, //position.minScrollExtent,
+        trailingExtent: -RefreshIndicatorPhysics.height!,
         tolerance: tolerance,
       );
     }

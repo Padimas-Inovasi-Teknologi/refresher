@@ -10,23 +10,23 @@ import 'package:refresher/refresh_indicator_physics.dart';
 typedef Future<void> RefreshCallback();
 
 class InfiniteRefresher extends StatefulWidget {
-  final RefreshCallback onRefresh;
-  final ScrollController scrollController;
+  final RefreshCallback? onRefresh;
+  final ScrollController? scrollController;
   final bool vanishAfterDrag;
   final double loadingSize;
   final EdgeInsets margin;
-  final InfiniteListRemote remote;
-  final WidgetBuilder widgetBuilder;
-  final Fetcher fetcher;
-  final int cursor;
-  final bool noMoreData;
+  final InfiniteListRemote? remote;
+  final WidgetBuilder? widgetBuilder;
+  final Fetcher? fetcher;
+  final int? cursor;
+  final bool? noMoreData;
 
   InfiniteRefresher({
     this.scrollController,
     this.onRefresh,
-    bool vanishAfterDrag,
-    double loadingSize,
-    EdgeInsets margin,
+    bool? vanishAfterDrag,
+    double? loadingSize,
+    EdgeInsets? margin,
     this.remote,
     this.widgetBuilder,
     this.fetcher,
@@ -42,23 +42,23 @@ class InfiniteRefresher extends StatefulWidget {
 
 class _InfiniteRefresherState extends State<InfiniteRefresher>
     with TickerProviderStateMixin {
-  ScrollController _scrollController;
+  ScrollController? _scrollController;
   double _height = 0.0;
-  double _maxHeight;
+  double? _maxHeight;
   bool _refreshing = false;
   bool _aboutToRefresh = false;
   bool _show = false;
   bool _needRebuild = false;
-  AnimationController _animationController;
-  AnimationController _sizeAnimationController;
+  AnimationController? _animationController;
+  late AnimationController _sizeAnimationController;
   bool _mayPerform = false;
   bool _mayRefresh = true;
   LoadingController _tempRefreshController = LoadingController();
   LoadingController _refreshController = LoadingController(thickness: 4.0);
   double percentage = 0.0;
-  InfiniteListRemote _remote;
+  InfiniteListRemote? _remote;
 
-  InfiniteListRemote get _effectiveRemote => widget.remote ?? _remote;
+  InfiniteListRemote? get _effectiveRemote => widget.remote ?? _remote;
 
   @override
   void initState() {
@@ -93,7 +93,7 @@ class _InfiniteRefresherState extends State<InfiniteRefresher>
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _animationController!.dispose();
     _sizeAnimationController.dispose();
     super.dispose();
   }
@@ -101,19 +101,19 @@ class _InfiniteRefresherState extends State<InfiniteRefresher>
   @override
   Widget build(BuildContext context) {
     if (_needRebuild) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance!.addPostFrameCallback((_) {
         setState(() {
           _show = true;
           _height = 0.0;
           _needRebuild = false;
-          _scrollController.jumpTo(0.0);
+          _scrollController!.jumpTo(0.0);
         });
       });
     }
 
     if (_show && _sizeAnimationController.value == 0.0)
       _sizeAnimationController.value = 1.0;
-    _tempRefreshController.thickness = 4.0 * _height / _maxHeight;
+    _tempRefreshController.thickness = 4.0 * _height / _maxHeight!;
 
     return Stack(children: [
       Column(children: [
@@ -146,8 +146,8 @@ class _InfiniteRefresherState extends State<InfiniteRefresher>
                           ? AlwaysBouncingScrollPhysics()
                           : NotBouncingScrollPhysics(),
                       remote: _effectiveRemote,
-                      widgetBuilder: widget.widgetBuilder,
-                      fetcher: widget.fetcher,
+                      widgetBuilder: widget.widgetBuilder!,
+                      fetcher: widget.fetcher!,
                       cursor: widget.cursor,
                       noMoreData: widget.noMoreData,
                     ),
@@ -164,10 +164,10 @@ class _InfiniteRefresherState extends State<InfiniteRefresher>
           child: Container(
               child: LoadingAnimation(
                   margin: EdgeInsets.only(
-                    top: widget.margin.top * _height / _maxHeight,
-                    left: widget.margin.left * _height / _maxHeight,
-                    bottom: widget.margin.bottom * _height / _maxHeight,
-                    right: widget.margin.right * _height / _maxHeight,
+                    top: widget.margin.top * _height / _maxHeight!,
+                    left: widget.margin.left * _height / _maxHeight!,
+                    bottom: widget.margin.bottom * _height / _maxHeight!,
+                    right: widget.margin.right * _height / _maxHeight!,
                   ),
                   size: widget.loadingSize,
                   controller: _tempRefreshController,
@@ -202,20 +202,20 @@ class _InfiniteRefresherState extends State<InfiniteRefresher>
           if (notification.metrics.pixels < 0) {
             double scrollPosition = notification.metrics.pixels.abs();
 
-            if (scrollPosition >= _maxHeight) {
+            if (scrollPosition >= _maxHeight!) {
               if (!_aboutToRefresh) {
-                _animationController.repeat();
+                _animationController!.repeat();
                 _aboutToRefresh = true;
                 if (!_refreshing) {
                   _refreshing = true;
                   _show = true;
 
-                  _scrollController.jumpTo(0.0);
+                  _scrollController!.jumpTo(0.0);
 
                   if (widget.onRefresh != null)
-                    widget.onRefresh().then((_) {
-                      if (this.mounted) _animationController.stop();
-                      _effectiveRemote.resetWithoutFetch();
+                    widget.onRefresh!().then((_) {
+                      if (this.mounted) _animationController!.stop();
+                      _effectiveRemote!.resetWithoutFetch();
                       if (this.mounted)
                         _sizeAnimationController.reverse(from: 1.0).then((_) {
                           if (this.mounted)
@@ -229,14 +229,14 @@ class _InfiniteRefresherState extends State<InfiniteRefresher>
               }
             } else {
               if (_aboutToRefresh && !_refreshing) {
-                _animationController.stop();
+                _animationController!.stop();
               }
               _aboutToRefresh = false;
               _tempRefreshController.percentage =
-                  scrollPosition / _maxHeight * widget.loadingSize;
+                  scrollPosition / _maxHeight! * widget.loadingSize;
             }
 
-            _height = scrollPosition.clamp(0.0, _maxHeight);
+            _height = scrollPosition.clamp(0.0, _maxHeight!);
           } else if (notification.metrics.pixels > 0) {
             _height = 0.0;
           }

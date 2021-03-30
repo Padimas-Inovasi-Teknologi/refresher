@@ -1,3 +1,7 @@
+## 2.0.0
+
+* Migrate to Null-Safety
+
 ## 1.0.0+2
 
 * Add LoadingAnimation.defaultLineColor and LoadingAnimation.defaultProgressColor

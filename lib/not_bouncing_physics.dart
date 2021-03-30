@@ -17,10 +17,10 @@ import 'package:flutter/material.dart';
 ///    clamping behavior.
 class NotBouncingScrollPhysics extends ScrollPhysics {
   /// Creates scroll physics that bounce back from the edge.
-  const NotBouncingScrollPhysics({ScrollPhysics parent}) : super(parent: parent);
+  const NotBouncingScrollPhysics({ScrollPhysics? parent}) : super(parent: parent);
 
   @override
-  NotBouncingScrollPhysics applyTo(ScrollPhysics ancestor) {
+  NotBouncingScrollPhysics applyTo(ScrollPhysics? ancestor) {
     return NotBouncingScrollPhysics(parent: buildParent(ancestor));
   }
 
@@ -98,10 +98,10 @@ class NotBouncingScrollPhysics extends ScrollPhysics {
   }
 
   @override
-  Simulation createBallisticSimulation(ScrollMetrics position, double velocity) {
+  Simulation? createBallisticSimulation(ScrollMetrics position, double velocity) {
     final Tolerance tolerance = this.tolerance;
     if (position.outOfRange) {
-      double end;
+      double? end;
       if (position.pixels > position.maxScrollExtent)
         end = position.maxScrollExtent;
       if (position.pixels < position.minScrollExtent)
@@ -110,7 +110,7 @@ class NotBouncingScrollPhysics extends ScrollPhysics {
       return ScrollSpringSimulation(
           spring,
           position.pixels,
-          end,
+          end!,
           math.min(0.0, velocity),
           tolerance: tolerance
       );

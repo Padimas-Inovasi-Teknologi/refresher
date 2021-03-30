@@ -8,27 +8,27 @@ typedef void ResetFunction();
 typedef Future<bool> Fetcher(BuildContext context, int cursor);
 
 class InfiniteListRemote {
-  ResetFunction reset;
-  ResetFunction resetWithoutFetch;
+  ResetFunction? reset;
+  late ResetFunction resetWithoutFetch;
 }
 
 class InfiniteListView extends StatefulWidget {
-  final InfiniteListRemote remote;
+  final InfiniteListRemote? remote;
   final WidgetBuilder widgetBuilder;
   final Fetcher fetcher;
-  final ScrollController scrollController;
-  final ScrollPhysics scrollPhysics;
+  final ScrollController? scrollController;
+  final ScrollPhysics? scrollPhysics;
   final bool isRefreshing;
-  final int cursor;
-  final bool noMoreData;
+  final int? cursor;
+  final bool? noMoreData;
 
   InfiniteListView({
     this.remote,
-    this.widgetBuilder,
-    this.fetcher,
+    required this.widgetBuilder,
+    required this.fetcher,
     this.scrollController,
     this.scrollPhysics,
-    bool isRefreshing,
+    bool? isRefreshing,
     this.cursor,
     this.noMoreData,
   })  : assert(widgetBuilder != null),
@@ -41,12 +41,12 @@ class InfiniteListView extends StatefulWidget {
 
 class _InfiniteListViewState extends State<InfiniteListView>
     with SingleTickerProviderStateMixin {
-  ScrollController _scrollController;
+  ScrollController? _scrollController;
   bool isPerformingRequest = false;
   int _cursor = 0;
   bool _noMoreData = false;
   bool enableOverScroll = true;
-  AnimationController anim;
+  AnimationController? anim;
   bool firstBuild = true;
   bool _mayRefresh = true;
   bool _shouldScrollToTheMax = false;
@@ -76,8 +76,8 @@ class _InfiniteListViewState extends State<InfiniteListView>
 
   @override
   void dispose() {
-    anim.dispose();
-    _scrollController.dispose();
+    anim!.dispose();
+    _scrollController!.dispose();
     super.dispose();
   }
 
@@ -105,15 +105,15 @@ class _InfiniteListViewState extends State<InfiniteListView>
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       if (isPerformingRequest &&
-          _scrollController.hasClients &&
-          !anim.isAnimating) {
-        anim.repeat();
+          _scrollController!.hasClients &&
+          !anim!.isAnimating) {
+        anim!.repeat();
         if (_shouldScrollToTheMax) {
           _shouldScrollToTheMax = false;
-          _scrollController.animateTo(
-            _scrollController.position.maxScrollExtent,
+          _scrollController!.animateTo(
+            _scrollController!.position.maxScrollExtent,
             curve: Curves.easeOut,
             duration: const Duration(milliseconds: 200),
           );
@@ -122,22 +122,22 @@ class _InfiniteListViewState extends State<InfiniteListView>
     });
 
     if (firstBuild) {
-      _scrollController.addListener(() {
+      _scrollController!.addListener(() {
         if (!widget.isRefreshing &&
-            _scrollController.position.maxScrollExtent > 0.0 &&
-            _scrollController.position.pixels ==
-                _scrollController.position.maxScrollExtent) {
+            _scrollController!.position.maxScrollExtent > 0.0 &&
+            _scrollController!.position.pixels ==
+                _scrollController!.position.maxScrollExtent) {
           _tryFetchMore(context);
           _shouldScrollToTheMax = true;
         }
       });
 
       if (widget.remote != null) {
-        widget.remote.reset = () {
+        widget.remote!.reset = () {
           _reset(context);
         };
 
-        widget.remote.resetWithoutFetch = () {
+        widget.remote!.resetWithoutFetch = () {
           _noMoreData = false;
           _cursor = 1;
         };
@@ -154,7 +154,7 @@ class _InfiniteListViewState extends State<InfiniteListView>
     if (isPerformingRequest) {
       children.add(_buildProgressIndicator());
     } else {
-      anim.stop();
+      anim!.stop();
     }
 
     return SingleChildScrollView(

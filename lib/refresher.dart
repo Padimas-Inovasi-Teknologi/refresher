@@ -10,19 +10,19 @@ typedef Future<void> RefreshCallback();
 
 class Refresher extends StatefulWidget {
   final Widget child;
-  final RefreshCallback onRefresh;
-  final ScrollController scrollController;
+  final RefreshCallback? onRefresh;
+  final ScrollController? scrollController;
   final bool vanishAfterDrag;
   final double loadingSize;
   final EdgeInsets margin;
 
   Refresher({
-    @required this.child,
+    required this.child,
     this.scrollController,
     this.onRefresh,
-    bool vanishAfterDrag,
-    double loadingSize,
-    EdgeInsets margin,
+    bool? vanishAfterDrag,
+    double? loadingSize,
+    EdgeInsets? margin,
   })  : this.vanishAfterDrag = vanishAfterDrag ?? false,
         this.loadingSize = loadingSize ?? 50.0,
         this.margin = margin ?? EdgeInsets.all(16.0);
@@ -32,15 +32,15 @@ class Refresher extends StatefulWidget {
 }
 
 class _RefresherState extends State<Refresher> with TickerProviderStateMixin {
-  ScrollController _scrollController;
+  ScrollController? _scrollController;
   double _height = 0.0;
-  double _maxHeight;
+  double? _maxHeight;
   bool _refreshing = false;
   bool _aboutToRefresh = false;
   bool _show = false;
   bool _needRebuild = false;
-  AnimationController _animationController;
-  AnimationController _sizeAnimationController;
+  AnimationController? _animationController;
+  late AnimationController _sizeAnimationController;
   bool _mayPerform = false;
   bool _mayRefresh = true;
   LoadingController _tempRefreshController = LoadingController();
@@ -62,7 +62,7 @@ class _RefresherState extends State<Refresher> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _animationController!.dispose();
     _sizeAnimationController.dispose();
     super.dispose();
   }
@@ -70,24 +70,24 @@ class _RefresherState extends State<Refresher> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     if (_needRebuild) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance!.addPostFrameCallback((_) {
         setState(() {
           _show = true;
           _height = 0.0;
           _needRebuild = false;
-          _scrollController.jumpTo(0.0);
+          _scrollController!.jumpTo(0.0);
         });
       });
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       isBuilding = false;
     });
 
     if (_show && _sizeAnimationController.value == 0.0)
       _sizeAnimationController.value = 1.0;
 
-    _tempRefreshController.thickness = 4.0 * _height / _maxHeight;
+    _tempRefreshController.thickness = 4.0 * _height / _maxHeight!;
     isBuilding = true;
 
     return Stack(children: [
@@ -133,10 +133,10 @@ class _RefresherState extends State<Refresher> with TickerProviderStateMixin {
           child: Container(
               child: LoadingAnimation(
                   margin: EdgeInsets.only(
-                    top: (widget.margin.top) * _height / _maxHeight,
-                    left: (widget.margin.left) * _height / _maxHeight,
-                    bottom: (widget.margin.bottom) * _height / _maxHeight,
-                    right: (widget.margin.right) * _height / _maxHeight,
+                    top: (widget.margin.top) * _height / _maxHeight!,
+                    left: (widget.margin.left) * _height / _maxHeight!,
+                    bottom: (widget.margin.bottom) * _height / _maxHeight!,
+                    right: (widget.margin.right) * _height / _maxHeight!,
                   ),
                   size: widget.loadingSize,
                   controller: _tempRefreshController,
@@ -167,19 +167,19 @@ class _RefresherState extends State<Refresher> with TickerProviderStateMixin {
           if (notification.metrics.pixels < 0) {
             double scrollPosition = notification.metrics.pixels.abs();
 
-            if (scrollPosition >= _maxHeight) {
+            if (scrollPosition >= _maxHeight!) {
               if (!_aboutToRefresh) {
-                _animationController.repeat();
+                _animationController!.repeat();
                 _aboutToRefresh = true;
                 if (!_refreshing) {
                   _refreshing = true;
                   _show = true;
 
-                  _scrollController.jumpTo(0.0);
+                  _scrollController!.jumpTo(0.0);
 
                   if (widget.onRefresh != null)
-                    widget.onRefresh().then((_) {
-                      if (this.mounted) _animationController.stop();
+                    widget.onRefresh!().then((_) {
+                      if (this.mounted) _animationController!.stop();
 
                       if (this.mounted)
                         _sizeAnimationController.reverse(from: 1.0).then((_) {
@@ -194,14 +194,14 @@ class _RefresherState extends State<Refresher> with TickerProviderStateMixin {
               }
             } else {
               if (_aboutToRefresh && !_refreshing) {
-                _animationController.stop();
+                _animationController!.stop();
               }
               _aboutToRefresh = false;
               _tempRefreshController.percentage =
-                  scrollPosition / _maxHeight * widget.loadingSize;
+                  scrollPosition / _maxHeight! * widget.loadingSize;
             }
 
-            _height = scrollPosition.clamp(0.0, _maxHeight);
+            _height = scrollPosition.clamp(0.0, _maxHeight!);
           } else if (notification.metrics.pixels > 0) {
             _height = 0.0;
           }
